@@ -18,22 +18,22 @@
 환경 확인 로그:
 
 ```bash
-$ uname -a
+dnldp550660@c5r7s7 ~ % uname -a
 Darwin c5r7s7.codyssey.kr 24.6.0 Darwin Kernel Version 24.6.0 ... x86_64
 
-$ docker --version
+dnldp550660@c5r7s7 ~ % docker --version
 Docker version 28.5.2, build ecc6942
 
-$ docker info --format '{{.ServerVersion}}'
+dnldp550660@c5r7s7 ~ % docker info --format '{{.ServerVersion}}'
 28.5.2
 
-$ git --version
+dnldp550660@c5r7s7 ~ % git --version
 git version 2.53.0
 ```
 
 ## 3) 수행 항목 체크리스트
 - [x] 터미널 기본 조작 (이동/생성/복사/이름변경/삭제 일부)
-- [ ] 권한 변경 실습(chmod 실제 실행)
+- [x] 권한 변경 실습(chmod 실제 실행)
 - [x] Docker 설치/기본 점검
 - [x] Docker 기본 운영 명령(images, ps, logs, stats)
 - [x] hello-world 실행
@@ -79,19 +79,136 @@ EXPOSE 80
 
 ## 6) 수행 로그
 
+### 터미널 조작 로그
+
+현재 위치 확인, 목록 확인(숨김 파일 포함), 이동, 생성, 복사, 이동/이름변경, 삭제
+
+```bash
+### 현재 디렉토리 확인 
+dnldp550660@c5r7s7 ~ % pwd
+/Users/dnldp550660
+
+### 목록 확인 (숨긴 파일 포함)
+dnldp550660@c5r7s7 ~ % ls -la
+total 32
+drwxr-x---+ 22 dnldp550660  dnldp550660   704 Jul 27 18:55 .
+drwxr-xr-x   6 root         admin         192 Jul 27 17:24 ..
+-r--------   1 dnldp550660  dnldp550660     7 Jul 27 17:24 .CFUserTextEncoding
+drwx------   3 dnldp550660  dnldp550660    96 Jul 27 18:29 .copilot
+drwxr-xr-x   8 dnldp550660  dnldp550660   256 Jul 27 18:30 .docker
+-rw-------   1 dnldp550660  dnldp550660    69 Jul 27 18:55 .git-credentials
+-rw-r--r--   1 dnldp550660  dnldp550660    78 Jul 27 18:14 .gitconfig
+drwxr-xr-x  10 dnldp550660  dnldp550660   320 Jul 27 17:31 .orbstack
+drwxr-xr-x   7 dnldp550660  dnldp550660   224 Jul 27 18:12 .ssh
+drwx------+  4 dnldp550660  dnldp550660   128 Jul 27 18:17 .Trash
+drwxr-xr-x   5 dnldp550660  dnldp550660   160 Jul 27 17:59 .vscode
+-rw-------   1 dnldp550660  dnldp550660    47 Jul 27 18:04 .zsh_history
+drwx------   4 dnldp550660  dnldp550660   128 Jul 27 17:35 .zsh_sessions
+drwx------+  3 dnldp550660  dnldp550660    96 Jul 27 17:24 Desktop
+drwx------+  3 dnldp550660  dnldp550660    96 Jul 27 17:24 Documents
+drwx------+  5 dnldp550660  dnldp550660   160 Jul 27 18:43 Downloads
+drwx------@ 78 dnldp550660  dnldp550660  2496 Jul 27 17:42 Library
+drwx------   3 dnldp550660  dnldp550660    96 Jul 27 17:24 Movies
+drwx------+  3 dnldp550660  dnldp550660    96 Jul 27 17:24 Music
+drwx------   4 dnldp550660  dnldp550660   160 Jul 27 17:31 OrbStack
+drwx------+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Pictures
+drwxr-xr-x+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Public
+
+### 파일 경로 이동
+dnldp550660@c5r7s7 ~ % cd Downloads
+
+### 디렉토리 생성하기 
+dnldp550660@c5r7s7 Downloads % mkdir test
+
+### 파일 생성 및 복사 
+dnldp550660@c5r7s7 Downloads % cat > test.txt
+this is test
+dnldp550660@c5r7s7 Downloads % 
+dnldp550660@c5r7s7 Downloads % cp test.txt test2.txt
+dnldp550660@c5r7s7 Downloads % 
+
+### 파일 이동 
+dnldp550660@c5r7s7 Downloads % mv test.txt ./
+mv: test.txt and ./test.txt are identical
+dnldp550660@c5r7s7 Downloads % mv test.txt ..
+
+### 파일 제거
+dnldp550660@c5r7s7 Downloads % rm test2.txt 
+
+### 파일 뒤로가기 
+dnldp550660@c5r7s7 Downloads % cd ..
+
+### 파일 이름 변경하기 
+dnldp550660@c5r7s7 ~ % mv test.txt codyssey.txt
+
+### 파일 상태 확인 
+dnldp550660@c5r7s7 ~ % ls -la
+total 40
+drwxr-x---+ 23 dnldp550660  dnldp550660   736 Jul 27 19:05 .
+drwxr-xr-x   6 root         admin         192 Jul 27 17:24 ..
+-r--------   1 dnldp550660  dnldp550660     7 Jul 27 17:24 .CFUserTextEncoding
+drwx------   3 dnldp550660  dnldp550660    96 Jul 27 18:29 .copilot
+drwxr-xr-x   8 dnldp550660  dnldp550660   256 Jul 27 18:30 .docker
+-rw-------   1 dnldp550660  dnldp550660    69 Jul 27 18:55 .git-credentials
+-rw-r--r--   1 dnldp550660  dnldp550660    78 Jul 27 18:14 .gitconfig
+drwxr-xr-x  10 dnldp550660  dnldp550660   320 Jul 27 17:31 .orbstack
+drwxr-xr-x   7 dnldp550660  dnldp550660   224 Jul 27 18:12 .ssh
+drwx------+  4 dnldp550660  dnldp550660   128 Jul 27 18:17 .Trash
+drwxr-xr-x   5 dnldp550660  dnldp550660   160 Jul 27 17:59 .vscode
+-rw-------   1 dnldp550660  dnldp550660    47 Jul 27 18:04 .zsh_history
+drwx------   4 dnldp550660  dnldp550660   128 Jul 27 17:35 .zsh_sessions
+-rw-r--r--   1 dnldp550660  dnldp550660    13 Jul 27 19:03 codyssey.txt
+drwx------+  3 dnldp550660  dnldp550660    96 Jul 27 17:24 Desktop
+drwx------+  3 dnldp550660  dnldp550660    96 Jul 27 17:24 Documents
+drwx------+  6 dnldp550660  dnldp550660   192 Jul 27 19:04 Downloads
+drwx------@ 78 dnldp550660  dnldp550660  2496 Jul 27 17:42 Library
+drwx------   3 dnldp550660  dnldp550660    96 Jul 27 17:24 Movies
+drwx------+  3 dnldp550660  dnldp550660    96 Jul 27 17:24 Music
+drwx------   4 dnldp550660  dnldp550660   160 Jul 27 17:31 OrbStack
+drwx------+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Pictures
+drwxr-xr-x+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Public
+dnldp550660@c5r7s7 ~ % 
+
+### 특정 파일 상태 확인하기 
+nldp550660@c5r7s7 ~ % ls -la Downloads
+total 0
+drwx------+  6 dnldp550660  dnldp550660  192 Jul 27 19:04 .
+drwxr-x---+ 23 dnldp550660  dnldp550660  736 Jul 27 19:05 ..
+drwxr-xr-x   9 dnldp550660  dnldp550660  288 Jul 27 18:49 codyssey
+drwxr-xr-x   3 dnldp550660  dnldp550660   96 Jul 27 18:43 permission-lab
+drwxr-xr-x   5 dnldp550660  dnldp550660  160 Jul 27 18:43 practice
+drwxr-xr-x   2 dnldp550660  dnldp550660   64 Jul 27 19:01 test
+dnldp550660@c5r7s7 ~ % 
+
+### 권한 부여 (모든 사용자 읽기 쓰기 실행 권한 부여하기 - 777)
+dnldp550660@c5r7s7 ~ % mkdir root
+dnldp550660@c5r7s7 ~ % cat > root/root.txt
+test r w x chmod
+dnldp550660@c5r7s7 ~ % 
+dnldp550660@c5r7s7 root % chmod 777 *
+dnldp550660@c5r7s7 root % ls -la
+total 8
+drwxrwxrwx   3 dnldp550660  dnldp550660   96 Jul 27 19:09 .
+drwxr-x---+ 24 dnldp550660  dnldp550660  768 Jul 27 19:08 ..
+-rwxrwxrwx   1 dnldp550660  dnldp550660   17 Jul 27 19:09 root.txt
+dnldp550660@c5r7s7 root % 
+
+```
+
+
 ### 6-1. Docker 빌드/실행
 ```bash
-$ docker build -t codyssey .
+dnldp550660@c5r7s7 ~ % docker build -t codyssey .
 [+] Building 0.5s (7/7) FINISHED
 => naming to docker.io/library/codyssey
 
-$ docker run -d -p 8080:80 --name codyssey-web codyssey
+dnldp550660@c5r7s7 ~ % docker run -d -p 8080:80 --name codyssey-web codyssey
 <container_id>
 ```
 
 ### 6-2. 포트 매핑
 ```bash
-$ docker port codyssey-web
+dnldp550660@c5r7s7 ~ % docker port codyssey-web
 80/tcp -> 0.0.0.0:8080
 80/tcp -> [::]:8080
 ```
@@ -101,34 +218,34 @@ $ docker port codyssey-web
 
 ### 6-3. Docker 운영 명령
 ```bash
-$ docker images
+dnldp550660@c5r7s7 ~ % docker images
 REPOSITORY   TAG      IMAGE ID       CREATED          SIZE
 codyssey     latest   55b64a62849e   12 minutes ago   62.4MB
 
-$ docker ps
+dnldp550660@c5r7s7 ~ % docker ps
 NAMES          IMAGE      STATUS         PORTS
 codyssey-web   codyssey   Up 3 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
 
-$ docker logs --tail 10 codyssey-web
+dnldp550660@c5r7s7 ~ % docker logs --tail 10 codyssey-web
 ... start worker processes
 ... "GET / HTTP/1.1" 200 ...
 
-$ docker stats --no-stream codyssey-web
+dnldp550660@c5r7s7 ~ % docker stats --no-stream codyssey-web
 CONTAINER ID   NAME           CPU %   MEM USAGE / LIMIT   ...
 ...            codyssey-web   0.00%   6.262MiB / 15.67GiB ...
 ```
 
 ### 6-4. hello-world
 ```bash
-$ docker run --rm hello-world
+dnldp550660@c5r7s7 ~ % docker run --rm hello-world
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
 ```
 
 ### 6-5. ubuntu 컨테이너 실습
 ```bash
-$ docker run -d --name codyssey-ubuntu ubuntu sleep infinity
-$ docker exec codyssey-ubuntu sh -lc 'echo inside-ubuntu && ls / | head -n 8'
+dnldp550660@c5r7s7 ~ % docker run -d --name codyssey-ubuntu ubuntu sleep infinity
+dnldp550660@c5r7s7 ~ % docker exec codyssey-ubuntu sh -lc 'echo inside-ubuntu && ls / | head -n 8'
 inside-ubuntu
 bin
 boot
@@ -139,7 +256,7 @@ lib
 lib64
 media
 
-$ docker rm -f codyssey-ubuntu
+dnldp550660@c5r7s7 ~ % docker rm -f codyssey-ubuntu
 ```
 
 attach/exec 관찰 정리:
@@ -149,19 +266,19 @@ attach/exec 관찰 정리:
 
 ### 6-6. 바인드 마운트
 ```bash
-$ docker run -d --rm --name codyssey-bind -p 8081:80 \
+dnldp550660@c5r7s7 ~ % docker run -d --rm --name codyssey-bind -p 8081:80 \
 	-v "$PWD/app:/usr/share/nginx/html:ro" nginx:alpine
 
-$ docker exec codyssey-bind sh -lc 'head -n 3 /usr/share/nginx/html/index.html'
+dnldp550660@c5r7s7 ~ % docker exec codyssey-bind sh -lc 'head -n 3 /usr/share/nginx/html/index.html'
 <!-- app/index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 
 # 호스트 파일 변경 후
-$ docker exec codyssey-bind sh -lc 'tail -n 3 /usr/share/nginx/html/index.html'
+dnldp550660@c5r7s7 ~ % docker exec codyssey-bind sh -lc 'tail -n 3 /usr/share/nginx/html/index.html'
 ...</html><p>bind mount update check</p>
 
-$ docker stop codyssey-bind
+dnldp550660@c5r7s7 ~ % docker stop codyssey-bind
 ```
 
 결론:
@@ -169,18 +286,18 @@ $ docker stop codyssey-bind
 
 ### 6-7. 볼륨 영속성
 ```bash
-$ docker volume create codyssey-data
+dnldp550660@c5r7s7 ~ % docker volume create codyssey-data
 codyssey-data
 
-$ docker run -d --name vol-test-1 -v codyssey-data:/data ubuntu sleep infinity
-$ docker exec vol-test-1 sh -lc 'echo persistent-data > /data/hello.txt; cat /data/hello.txt'
+dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-1 -v codyssey-data:/data ubuntu sleep infinity
+dnldp550660@c5r7s7 ~ % docker exec vol-test-1 sh -lc 'echo persistent-data > /data/hello.txt; cat /data/hello.txt'
 persistent-data
-$ docker rm -f vol-test-1
+dnldp550660@c5r7s7 ~ % docker rm -f vol-test-1
 
-$ docker run -d --name vol-test-2 -v codyssey-data:/data ubuntu sleep infinity
-$ docker exec vol-test-2 sh -lc 'cat /data/hello.txt'
+dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-2 -v codyssey-data:/data ubuntu sleep infinity
+dnldp550660@c5r7s7 ~ % docker exec vol-test-2 sh -lc 'cat /data/hello.txt'
 persistent-data
-$ docker rm -f vol-test-2
+dnldp550660@c5r7s7 ~ % docker rm -f vol-test-2
 ```
 
 결론:
@@ -188,11 +305,11 @@ $ docker rm -f vol-test-2
 
 ### 6-8. Git/GitHub 상태
 ```bash
-$ git config --list | grep -E 'user.name|user.email|init.defaultbranch'
+dnldp550660@c5r7s7 ~ % git config --list | grep -E 'user.name|user.email|init.defaultbranch'
 user.name=wogho_
 user.email=dnldp55***@gmail.com
 
-$ git rev-parse --is-inside-work-tree
+dnldp550660@c5r7s7 ~ % git rev-parse --is-inside-work-tree
 not-a-git-repo
 ```
 
@@ -203,15 +320,15 @@ not-a-git-repo
 
 ## 7) 터미널 기본 조작 로그(발췌)
 ```bash
-$ pwd
+dnldp550660@c5r7s7 ~ % pwd
 /Users/dnldp550660/Downloads
 
-$ mkdir -p practice && cd practice
-$ touch empty.txt
-$ echo 'hello terminal' > note.txt
-$ cp note.txt note-copy.txt
-$ mv note-copy.txt note-renamed.txt
-$ cat note-renamed.txt
+dnldp550660@c5r7s7 ~ % mkdir -p practice && cd practice
+dnldp550660@c5r7s7 ~ % touch empty.txt
+dnldp550660@c5r7s7 ~ % echo 'hello terminal' > note.txt
+dnldp550660@c5r7s7 ~ % cp note.txt note-copy.txt
+dnldp550660@c5r7s7 ~ % mv note-copy.txt note-renamed.txt
+dnldp550660@c5r7s7 ~ % cat note-renamed.txt
 hello terminal
 ```
 
