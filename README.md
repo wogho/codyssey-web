@@ -18,15 +18,15 @@
 환경 확인 로그:
 
 ```bash
+# OS 버전 확인
 dnldp550660@c5r7s7 ~ % uname -a
 Darwin c5r7s7.codyssey.kr 24.6.0 Darwin Kernel Version 24.6.0 ... x86_64
 
+# Docker 버전 확인
 dnldp550660@c5r7s7 ~ % docker --version
 Docker version 28.5.2, build ecc6942
 
-dnldp550660@c5r7s7 ~ % docker info --format '{{.ServerVersion}}'
-28.5.2
-
+# Git 버전 확인
 dnldp550660@c5r7s7 ~ % git --version
 git version 2.53.0
 ```
@@ -84,11 +84,11 @@ EXPOSE 80
 현재 위치 확인, 목록 확인(숨김 파일 포함), 이동, 생성, 복사, 이동/이름변경, 삭제
 
 ```bash
-### 현재 디렉토리 확인 
+# 현재 디렉토리 확인
 dnldp550660@c5r7s7 ~ % pwd
 /Users/dnldp550660
 
-### 목록 확인 (숨긴 파일 포함)
+# 목록 확인 (숨긴 파일 포함)
 dnldp550660@c5r7s7 ~ % ls -la
 total 32
 drwxr-x---+ 22 dnldp550660  dnldp550660   704 Jul 27 18:55 .
@@ -114,34 +114,36 @@ drwx------   4 dnldp550660  dnldp550660   160 Jul 27 17:31 OrbStack
 drwx------+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Pictures
 drwxr-xr-x+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Public
 
-### 파일 경로 이동
+# 파일 경로 이동
 dnldp550660@c5r7s7 ~ % cd Downloads
 
-### 디렉토리 생성하기 
+# 디렉토리 생성
 dnldp550660@c5r7s7 Downloads % mkdir test
 
-### 파일 생성 및 복사 
+# 파일 생성
 dnldp550660@c5r7s7 Downloads % cat > test.txt
 this is test
 dnldp550660@c5r7s7 Downloads % 
+# 파일 복사
 dnldp550660@c5r7s7 Downloads % cp test.txt test2.txt
 dnldp550660@c5r7s7 Downloads % 
 
-### 파일 이동 
+# 파일 이동
 dnldp550660@c5r7s7 Downloads % mv test.txt ./
 mv: test.txt and ./test.txt are identical
+# 상위 디렉토리로 파일 이동
 dnldp550660@c5r7s7 Downloads % mv test.txt ..
 
-### 파일 제거
+# 파일 삭제
 dnldp550660@c5r7s7 Downloads % rm test2.txt 
 
-### 파일 뒤로가기 
+# 상위 경로로 이동
 dnldp550660@c5r7s7 Downloads % cd ..
 
-### 파일 이름 변경하기 
+# 파일 이름 변경
 dnldp550660@c5r7s7 ~ % mv test.txt codyssey.txt
 
-### 파일 상태 확인 
+# 파일 상태 확인
 dnldp550660@c5r7s7 ~ % ls -la
 total 40
 drwxr-x---+ 23 dnldp550660  dnldp550660   736 Jul 27 19:05 .
@@ -169,7 +171,7 @@ drwx------+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Pictures
 drwxr-xr-x+  4 dnldp550660  dnldp550660   128 Jul 27 17:24 Public
 dnldp550660@c5r7s7 ~ % 
 
-### 특정 파일 상태 확인하기 
+# 특정 경로 상태 확인
 nldp550660@c5r7s7 ~ % ls -la Downloads
 total 0
 drwx------+  6 dnldp550660  dnldp550660  192 Jul 27 19:04 .
@@ -180,12 +182,15 @@ drwxr-xr-x   5 dnldp550660  dnldp550660  160 Jul 27 18:43 practice
 drwxr-xr-x   2 dnldp550660  dnldp550660   64 Jul 27 19:01 test
 dnldp550660@c5r7s7 ~ % 
 
-### 권한 부여 (모든 사용자 읽기 쓰기 실행 권한 부여하기 - 777)
+# 권한 실습용 디렉토리 생성
 dnldp550660@c5r7s7 ~ % mkdir root
+# 권한 실습용 파일 생성
 dnldp550660@c5r7s7 ~ % cat > root/root.txt
 test r w x chmod
 dnldp550660@c5r7s7 ~ % 
+# 파일 권한을 777로 변경
 dnldp550660@c5r7s7 root % chmod 777 *
+# 권한 변경 결과 확인
 dnldp550660@c5r7s7 root % ls -la
 total 8
 drwxrwxrwx   3 dnldp550660  dnldp550660   96 Jul 27 19:09 .
@@ -198,16 +203,19 @@ dnldp550660@c5r7s7 root %
 
 ### 6-1. Docker 빌드/실행
 ```bash
+# 커스텀 이미지 빌드
 dnldp550660@c5r7s7 ~ % docker build -t codyssey .
 [+] Building 0.5s (7/7) FINISHED
 => naming to docker.io/library/codyssey
 
+# 컨테이너 실행 및 포트 매핑
 dnldp550660@c5r7s7 ~ % docker run -d -p 8080:80 --name codyssey-web codyssey
 <container_id>
 ```
 
 ### 6-2. 포트 매핑
 ```bash
+# 포트 매핑 결과 확인
 dnldp550660@c5r7s7 ~ % docker port codyssey-web
 80/tcp -> 0.0.0.0:8080
 80/tcp -> [::]:8080
@@ -218,18 +226,22 @@ dnldp550660@c5r7s7 ~ % docker port codyssey-web
 
 ### 6-3. Docker 운영 명령
 ```bash
+# 로컬 이미지 목록 확인
 dnldp550660@c5r7s7 ~ % docker images
 REPOSITORY   TAG      IMAGE ID       CREATED          SIZE
 codyssey     latest   55b64a62849e   12 minutes ago   62.4MB
 
+# 실행 중 컨테이너 목록 확인
 dnldp550660@c5r7s7 ~ % docker ps
 NAMES          IMAGE      STATUS         PORTS
 codyssey-web   codyssey   Up 3 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
 
+# 컨테이너 로그 확인
 dnldp550660@c5r7s7 ~ % docker logs --tail 10 codyssey-web
 ... start worker processes
 ... "GET / HTTP/1.1" 200 ...
 
+# 컨테이너 리소스 사용량 확인
 dnldp550660@c5r7s7 ~ % docker stats --no-stream codyssey-web
 CONTAINER ID   NAME           CPU %   MEM USAGE / LIMIT   ...
 ...            codyssey-web   0.00%   6.262MiB / 15.67GiB ...
@@ -237,6 +249,7 @@ CONTAINER ID   NAME           CPU %   MEM USAGE / LIMIT   ...
 
 ### 6-4. hello-world
 ```bash
+# hello-world 실행으로 Docker 동작 확인
 dnldp550660@c5r7s7 ~ % docker run --rm hello-world
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
@@ -244,7 +257,9 @@ This message shows that your installation appears to be working correctly.
 
 ### 6-5. ubuntu 컨테이너 실습
 ```bash
+# ubuntu 컨테이너 백그라운드 실행
 dnldp550660@c5r7s7 ~ % docker run -d --name codyssey-ubuntu ubuntu sleep infinity
+# 컨테이너 내부 명령 실행
 dnldp550660@c5r7s7 ~ % docker exec codyssey-ubuntu sh -lc 'echo inside-ubuntu && ls / | head -n 8'
 inside-ubuntu
 bin
@@ -256,6 +271,7 @@ lib
 lib64
 media
 
+# 실습 컨테이너 삭제
 dnldp550660@c5r7s7 ~ % docker rm -f codyssey-ubuntu
 ```
 
@@ -266,18 +282,22 @@ attach/exec 관찰 정리:
 
 ### 6-6. 바인드 마운트
 ```bash
+# 바인드 마운트로 웹 컨테이너 실행
 dnldp550660@c5r7s7 ~ % docker run -d --rm --name codyssey-bind -p 8081:80 \
 	-v "$PWD/app:/usr/share/nginx/html:ro" nginx:alpine
 
+# 마운트된 파일 앞부분 확인
 dnldp550660@c5r7s7 ~ % docker exec codyssey-bind sh -lc 'head -n 3 /usr/share/nginx/html/index.html'
 <!-- app/index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 
 # 호스트 파일 변경 후
+# 마운트된 파일 변경 반영 확인
 dnldp550660@c5r7s7 ~ % docker exec codyssey-bind sh -lc 'tail -n 3 /usr/share/nginx/html/index.html'
 ...</html><p>bind mount update check</p>
 
+# 바인드 마운트 컨테이너 중지
 dnldp550660@c5r7s7 ~ % docker stop codyssey-bind
 ```
 
@@ -286,17 +306,24 @@ dnldp550660@c5r7s7 ~ % docker stop codyssey-bind
 
 ### 6-7. 볼륨 영속성
 ```bash
+# Docker 볼륨 생성
 dnldp550660@c5r7s7 ~ % docker volume create codyssey-data
 codyssey-data
 
+# 1차 컨테이너 실행(볼륨 연결)
 dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-1 -v codyssey-data:/data ubuntu sleep infinity
+# 볼륨에 데이터 쓰기 및 확인
 dnldp550660@c5r7s7 ~ % docker exec vol-test-1 sh -lc 'echo persistent-data > /data/hello.txt; cat /data/hello.txt'
 persistent-data
+# 1차 컨테이너 삭제
 dnldp550660@c5r7s7 ~ % docker rm -f vol-test-1
 
+# 2차 컨테이너 실행(같은 볼륨 재연결)
 dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-2 -v codyssey-data:/data ubuntu sleep infinity
+# 볼륨 데이터 유지 여부 확인
 dnldp550660@c5r7s7 ~ % docker exec vol-test-2 sh -lc 'cat /data/hello.txt'
 persistent-data
+# 2차 컨테이너 삭제
 dnldp550660@c5r7s7 ~ % docker rm -f vol-test-2
 ```
 
@@ -305,10 +332,12 @@ dnldp550660@c5r7s7 ~ % docker rm -f vol-test-2
 
 ### 6-8. Git/GitHub 상태
 ```bash
+# Git 사용자 설정 확인
 dnldp550660@c5r7s7 ~ % git config --list | grep -E 'user.name|user.email|init.defaultbranch'
 user.name=wogho_
 user.email=dnldp55***@gmail.com
 
+# 현재 경로가 Git 저장소인지 확인
 dnldp550660@c5r7s7 ~ % git rev-parse --is-inside-work-tree
 not-a-git-repo
 ```
@@ -320,14 +349,21 @@ not-a-git-repo
 
 ## 7) 터미널 기본 조작 로그(발췌)
 ```bash
+# 현재 경로 확인
 dnldp550660@c5r7s7 ~ % pwd
 /Users/dnldp550660/Downloads
 
+# 연습 디렉토리 생성 및 이동
 dnldp550660@c5r7s7 ~ % mkdir -p practice && cd practice
+# 빈 파일 생성
 dnldp550660@c5r7s7 ~ % touch empty.txt
+# 텍스트 파일 생성
 dnldp550660@c5r7s7 ~ % echo 'hello terminal' > note.txt
+# 파일 복사
 dnldp550660@c5r7s7 ~ % cp note.txt note-copy.txt
+# 파일 이름 변경
 dnldp550660@c5r7s7 ~ % mv note-copy.txt note-renamed.txt
+# 파일 내용 확인
 dnldp550660@c5r7s7 ~ % cat note-renamed.txt
 hello terminal
 ```
@@ -383,17 +419,38 @@ hello terminal
 
 ## 9) 재현 절차 요약
 ```bash
+# 프로젝트 디렉토리로 이동
 cd /Users/dnldp550660/Downloads/codyssey
 
+# Docker 이미지 빌드
 docker build -t codyssey .
+# 웹 컨테이너 실행
 docker run -d -p 8080:80 --name codyssey-web codyssey
+# 포트 매핑 확인
 docker port codyssey-web
+# 최근 컨테이너 로그 확인
 docker logs --tail 20 codyssey-web
 
+# 바인드 마운트 컨테이너 실행
 docker run -d --rm --name codyssey-bind -p 8081:80 -v "$PWD/app:/usr/share/nginx/html:ro" nginx:alpine
+# 볼륨 생성
 docker volume create codyssey-data
 ```
 
 ## 10) 보안/개인정보 체크
 - 본 문서에는 토큰/비밀번호/개인키를 기록하지 않음.
 - GitHub 연동 스크린샷 첨부 시 민감정보(토큰, 인증 코드)는 반드시 마스킹.
+
+## 11) 과제 목표 한 줄 설명 멘트
+- 문제 지문: 절대 경로와 상대 경로의 차이를 예시를 들어 설명할 수 있다.
+	- 멘트: 절대 경로는 `/`처럼 루트부터 시작하는 고정 주소이고, 상대 경로는 현재 위치를 기준으로 찾는 주소라서 같은 파일도 위치에 따라 표현이 달라진다.
+- 문제 지문: 파일 권한의 의미(r/w/x)와 755, 644 같은 표기가 어떤 규칙으로 해석되는지 설명할 수 있다.
+	- 멘트: `r/w/x`는 읽기/쓰기/실행 권한이고, `755`·`644`는 소유자-그룹-기타 사용자 순서로 권한을 숫자(4, 2, 1) 합으로 표현한 방식이다.
+- 문제 지문: 기존 Dockerfile을 기반으로 "커스텀 이미지"를 만들 수 있다.
+	- 멘트: 기존 베이스 이미지를 유지한 채 `COPY`, `ENV`, `RUN` 등을 추가해 서비스 목적에 맞는 설정과 파일을 넣으면 커스텀 이미지가 된다.
+- 문제 지문: 포트 매핑이 필요한 이유를 설명할 수 있다.
+	- 멘트: 컨테이너 내부 포트는 외부에서 바로 접근이 어렵기 때문에, 호스트 포트와 연결해 브라우저나 클라이언트가 서비스에 접속할 수 있게 해야 한다.
+- 문제 지문: Docker 볼륨(영속 데이터)을 설명할 수 있다.
+	- 멘트: Docker 볼륨은 컨테이너를 삭제해도 데이터가 유지되는 저장소라서 업로드 파일, 로그, DB 같은 영속 데이터 보관에 필수다.
+- 문제 지문: Git과 GitHub의 역할 차이(로컬 버전관리 vs 원격 협업 플랫폼)를 설명할 수 있다.
+	- 멘트: Git은 로컬에서 버전 이력을 관리하는 도구이고, GitHub는 그 저장소를 원격으로 공유해 협업과 리뷰를 가능하게 하는 플랫폼이다.
