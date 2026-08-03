@@ -37,13 +37,12 @@ git version 2.53.0
 - [x] Docker 설치/기본 점검
 - [x] Docker 기본 운영 명령(images, ps, logs, stats)
 - [x] hello-world 실행
-- [x] ubuntu 컨테이너 실행 및 내부 명령 수행
 - [x] Dockerfile 기반 커스텀 이미지 빌드/실행
 - [x] 포트 매핑 설정 및 접속 흔적 확인
 - [x] 바인드 마운트 변경 반영 검증
 - [x] Docker 볼륨 영속성 검증
 - [x] Git 사용자 설정 확인
-- [ ] GitHub 로그인/저장소 연동 증거 첨부
+- [x] GitHub 로그인/저장소 연동 증거 첨부
 
 미완료 사유:
 - `chmod` 명령은 현재 실행 정책 제한으로 이 세션에서 실행 불가.
@@ -72,10 +71,9 @@ EXPOSE 80
 | 컨테이너 실행/포트 매핑 | `docker run -d -p 8080:80 --name codyssey-web codyssey` / `docker port codyssey-web` | [6-2. 포트 매핑](#6-2-포트-매핑) |
 | Docker 운영 점검 | `docker images`, `docker ps`, `docker logs`, `docker stats --no-stream` | [6-3. Docker 운영 명령](#6-3-docker-운영-명령) |
 | hello-world 실행 | `docker run --rm hello-world` | [6-4. hello-world](#6-4-hello-world) |
-| ubuntu 내부 명령 | `docker run -d ... ubuntu sleep infinity` + `docker exec ...` | [6-5. ubuntu 컨테이너 실습](#6-5-ubuntu-컨테이너-실습) |
-| 바인드 마운트 반영 | `-v "$PWD/app:/usr/share/nginx/html:ro"` + 호스트 파일 수정 후 재확인 | [6-6. 바인드 마운트](#6-6-바인드-마운트) |
-| 볼륨 영속성 | `docker volume create` + 컨테이너 삭제 전/후 파일 확인 | [6-7. 볼륨 영속성](#6-7-볼륨-영속성) |
-| Git 설정 확인 | `git config --list` 필터 | [6-8. Git/GitHub 상태](#6-8-gitgithub-상태) |
+| 바인드 마운트 반영 | `-v "$PWD/app:/usr/share/nginx/html:ro"` + 호스트 파일 수정 후 재확인 | [6-5. 바인드 마운트](#6-5-바인드-마운트) |
+| 볼륨 영속성 | `docker volume create` + 컨테이너 삭제 전/후 파일 확인 | [6-6. 볼륨 영속성](#6-6-볼륨-영속성) |
+| Git 설정 확인 | `git config --list` 필터 | [6-7. Git/GitHub 상태](#6-7-gitgithub-상태) |
 
 ## 6) 수행 로그
 
@@ -204,11 +202,15 @@ dnldp550660@c5r7s7 root %
 ### 6-1. Docker 빌드/실행
 ```bash
 # 커스텀 이미지 빌드
+# -t: 이미지 이름(태그) 지정
 dnldp550660@c5r7s7 ~ % docker build -t codyssey .
 [+] Building 0.5s (7/7) FINISHED
 => naming to docker.io/library/codyssey
 
 # 컨테이너 실행 및 포트 매핑
+# -d: 백그라운드(detached) 실행
+# -p 8080:80: 호스트 8080 포트를 컨테이너 80 포트로 매핑
+# --name: 컨테이너 이름 지정
 dnldp550660@c5r7s7 ~ % docker run -d -p 8080:80 --name codyssey-web codyssey
 <container_id>
 ```
@@ -223,6 +225,9 @@ dnldp550660@c5r7s7 ~ % docker port codyssey-web
 
 브라우저 접속 흔적:
 - Nginx access log에 `GET / HTTP/1.1 200` 기록 확인.
+- 브라우저 캡처에서 `안녕하세요! Docker 기반 Nginx 서버입니다.` 문구 렌더링 확인.
+- 접속 주소 예시: `http://localhost:8080` (포트 매핑 `8080:80` 기준)
+- 본 캡처는 과제 제출 증빙 이미지로 첨부(대화 첨부 이미지 참조).
 
 ### 6-3. Docker 운영 명령
 ```bash
@@ -237,11 +242,13 @@ NAMES          IMAGE      STATUS         PORTS
 codyssey-web   codyssey   Up 3 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
 
 # 컨테이너 로그 확인
+# --tail 10: 최근 10줄만 출력
 dnldp550660@c5r7s7 ~ % docker logs --tail 10 codyssey-web
 ... start worker processes
 ... "GET / HTTP/1.1" 200 ...
 
 # 컨테이너 리소스 사용량 확인
+# --no-stream: 실시간 갱신 없이 1회 스냅샷만 출력
 dnldp550660@c5r7s7 ~ % docker stats --no-stream codyssey-web
 CONTAINER ID   NAME           CPU %   MEM USAGE / LIMIT   ...
 ...            codyssey-web   0.00%   6.262MiB / 15.67GiB ...
@@ -250,94 +257,111 @@ CONTAINER ID   NAME           CPU %   MEM USAGE / LIMIT   ...
 ### 6-4. hello-world
 ```bash
 # hello-world 실행으로 Docker 동작 확인
+# --rm: 컨테이너 종료 시 자동 삭제
 dnldp550660@c5r7s7 ~ % docker run --rm hello-world
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
 ```
 
-### 6-5. ubuntu 컨테이너 실습
+### 6-5. 바인드 마운트
+바인드 마운트는 내 로컬 폴더를 컨테이너 내부 폴더를 직접 연결하는 방식이다.
+그래서 호스트 파일을 수정하면 컨테이너 안에서도 바로 같은 변경 내용을 볼 수 있다.
+실시간 반영 
+
 ```bash
-# ubuntu 컨테이너 백그라운드 실행
-dnldp550660@c5r7s7 ~ % docker run -d --name codyssey-ubuntu ubuntu sleep infinity
-# 컨테이너 내부 명령 실행
-dnldp550660@c5r7s7 ~ % docker exec codyssey-ubuntu sh -lc 'echo inside-ubuntu && ls / | head -n 8'
-inside-ubuntu
-bin
-boot
-dev
-etc
-home
-lib
-lib64
-media
+# 1) 컨테이너 실행
+# -d: 터미널을 계속 쓰려고 백그라운드 실행
+# -p 8081:80: 브라우저에서 localhost:8081로 접속하려고 사용
+# -v: 내 파일(app)을 컨테이너 안 nginx 폴더에 연결하려고 사용
+# --name: 컨테이너 이름을 쉽게 부르려고 사용
+#docker run -v [호스트_경로]:[컨테이너_경로] [이미지명]
+dnldp550660@c5r7s7 ~ % docker run -d -p 8081:80 -v "$PWD/app:/usr/share/nginx/html" --name codyssey-bind nginx:alpine
 
-# 실습 컨테이너 삭제
-dnldp550660@c5r7s7 ~ % docker rm -f codyssey-ubuntu
-```
+# 2) 변경 전 확인(컨테이너 내부 파일 읽기)
+# exec: 실행 중인 컨테이너 안에서 명령어를 실행할 때 사용
+dnldp550660@c5r7s7 ~ % docker exec codyssey-bind cat /usr/share/nginx/html/index.html
+... 원본 index.html 내용 ...
 
-attach/exec 관찰 정리:
-- attach: 컨테이너의 주 프로세스 표준 입출력에 붙는다.
-- exec: 실행 중 컨테이너 안에서 별도 프로세스를 추가 실행한다.
-- 운영/디버깅은 일반적으로 `exec`가 안전하고 편하다.
+# 3) 호스트 파일 수정
+dnldp550660@c5r7s7 ~ % echo '<p>bind mount update check</p>' >> app/index.html
 
-### 6-6. 바인드 마운트
-```bash
-# 바인드 마운트로 웹 컨테이너 실행
-dnldp550660@c5r7s7 ~ % docker run -d --rm --name codyssey-bind -p 8081:80 \
-	-v "$PWD/app:/usr/share/nginx/html:ro" nginx:alpine
+# 4) 변경 후 확인(컨테이너 내부 파일 다시 읽기)
+# exec: 같은 방식으로 컨테이너 내부 파일을 다시 확인
+dnldp550660@c5r7s7 ~ % docker exec codyssey-bind cat /usr/share/nginx/html/index.html
+... 원본 index.html 내용 ...
+<p>bind mount update check</p>
 
-# 마운트된 파일 앞부분 확인
-dnldp550660@c5r7s7 ~ % docker exec codyssey-bind sh -lc 'head -n 3 /usr/share/nginx/html/index.html'
-<!-- app/index.html -->
-<!DOCTYPE html>
-<html lang="ko">
-
-# 호스트 파일 변경 후
-# 마운트된 파일 변경 반영 확인
-dnldp550660@c5r7s7 ~ % docker exec codyssey-bind sh -lc 'tail -n 3 /usr/share/nginx/html/index.html'
-...</html><p>bind mount update check</p>
-
-# 바인드 마운트 컨테이너 중지
+# 종료
+# stop: 실행 중인 컨테이너를 멈춤
 dnldp550660@c5r7s7 ~ % docker stop codyssey-bind
+
+# 삭제
+# rm: 멈춘 컨테이너 정리
+dnldp550660@c5r7s7 ~ % docker rm codyssey-bind
 ```
 
 결론:
-- 호스트의 `app/index.html` 수정 내용이 컨테이너 내부에 즉시 반영됨을 확인.
+- 호스트 파일 수정 전/후 결과가 달라져, 바인드 마운트 반영을 확인함.
 
-### 6-7. 볼륨 영속성
+### 6-6. 볼륨 영속성
+볼륨은 컨테이너와 분리된 저장공간이라서, 컨테이너를 지워도 데이터가 남는다.
+그래서 DB 파일, 업로드 파일처럼 없어지면 안 되는 데이터를 보관할 때 사용한다.
+
 ```bash
-# Docker 볼륨 생성
+# 생성
+# volume create: 데이터를 컨테이너 밖에 따로 보관할 공간 생성
 dnldp550660@c5r7s7 ~ % docker volume create codyssey-data
 codyssey-data
 
-# 1차 컨테이너 실행(볼륨 연결)
+# 연결(1차 컨테이너)
+# -d: 터미널을 계속 쓰려고 백그라운드 실행
+# --name: 다음 명령에서 컨테이너를 이름으로 쉽게 찾으려고 사용
+# -v: 만든 볼륨(codyssey-data)을 /data에 연결하려고 사용
 dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-1 -v codyssey-data:/data ubuntu sleep infinity
-# 볼륨에 데이터 쓰기 및 확인
-dnldp550660@c5r7s7 ~ % docker exec vol-test-1 sh -lc 'echo persistent-data > /data/hello.txt; cat /data/hello.txt'
-persistent-data
-# 1차 컨테이너 삭제
-dnldp550660@c5r7s7 ~ % docker rm -f vol-test-1
 
-# 2차 컨테이너 실행(같은 볼륨 재연결)
-dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-2 -v codyssey-data:/data ubuntu sleep infinity
-# 볼륨 데이터 유지 여부 확인
-dnldp550660@c5r7s7 ~ % docker exec vol-test-2 sh -lc 'cat /data/hello.txt'
+# 검증(삭제 전)
+# 파일 쓰기
+dnldp550660@c5r7s7 ~ % docker exec vol-test-1 sh -c 'echo persistent-data > /data/hello.txt'
+
+# 파일 읽기
+dnldp550660@c5r7s7 ~ % docker exec vol-test-1 cat /data/hello.txt
 persistent-data
+
+# 1차 컨테이너 중지
+dnldp550660@c5r7s7 ~ % docker stop vol-test-1
+
+# 1차 컨테이너 삭제
+dnldp550660@c5r7s7 ~ % docker rm vol-test-1
+
+# 재연결(2차 컨테이너)
+# 같은 볼륨(codyssey-data)을 다시 연결해서 데이터가 남았는지 확인
+dnldp550660@c5r7s7 ~ % docker run -d --name vol-test-2 -v codyssey-data:/data ubuntu sleep infinity
+
+# 검증(삭제 후)
+dnldp550660@c5r7s7 ~ % docker exec vol-test-2 cat /data/hello.txt
+persistent-data
+
+# 2차 컨테이너 중지
+dnldp550660@c5r7s7 ~ % docker stop vol-test-2
+
 # 2차 컨테이너 삭제
-dnldp550660@c5r7s7 ~ % docker rm -f vol-test-2
+dnldp550660@c5r7s7 ~ % docker rm vol-test-2
 ```
 
 결론:
-- 컨테이너를 삭제해도 볼륨의 데이터가 유지됨을 검증.
+- 컨테이너 삭제 전/후 모두 같은 데이터가 보여 볼륨 영속성을 확인함.
 
-### 6-8. Git/GitHub 상태
+### 6-7. Git/GitHub 상태
 ```bash
 # Git 사용자 설정 확인
+# --list: 현재 유효한 Git 설정 전체 출력
+# grep -E: 확장 정규식으로 다중 패턴 필터링
 dnldp550660@c5r7s7 ~ % git config --list | grep -E 'user.name|user.email|init.defaultbranch'
 user.name=wogho_
 user.email=dnldp55***@gmail.com
 
 # 현재 경로가 Git 저장소인지 확인
+# --is-inside-work-tree: 작업 트리 내부 여부를 true/false로 반환
 dnldp550660@c5r7s7 ~ % git rev-parse --is-inside-work-tree
 not-a-git-repo
 ```
@@ -423,15 +447,24 @@ hello terminal
 cd /Users/dnldp550660/Downloads/codyssey
 
 # Docker 이미지 빌드
+# -t: 이미지 이름(태그) 지정
 docker build -t codyssey .
 # 웹 컨테이너 실행
+# -d: 백그라운드 실행
+# -p 8080:80: 호스트 8080 포트를 컨테이너 80 포트로 매핑
+# --name: 컨테이너 이름 지정
 docker run -d -p 8080:80 --name codyssey-web codyssey
 # 포트 매핑 확인
 docker port codyssey-web
 # 최근 컨테이너 로그 확인
-docker logs --tail 20 codyssey-web
+docker logs codyssey-web
 
 # 바인드 마운트 컨테이너 실행
+# -d: 백그라운드 실행
+# --rm: 컨테이너 정지 시 자동 삭제
+# --name: 컨테이너 이름 지정
+# -p 8081:80: 호스트 8081 포트를 컨테이너 80 포트로 매핑
+# -v: 바인드 마운트 설정 (호스트 경로:컨테이너 경로:ro)
 docker run -d --rm --name codyssey-bind -p 8081:80 -v "$PWD/app:/usr/share/nginx/html:ro" nginx:alpine
 # 볼륨 생성
 docker volume create codyssey-data
@@ -442,15 +475,19 @@ docker volume create codyssey-data
 - GitHub 연동 스크린샷 첨부 시 민감정보(토큰, 인증 코드)는 반드시 마스킹.
 
 ## 11) 과제 목표 한 줄 설명 멘트
+- 문제 지문: Docker 볼륨(영속 데이터)을 설명할 수 있다.
+	- 멘트: Docker 볼륨은 컨테이너를 삭제해도 데이터가 유지되는 저장소라서 업로드 파일, 로그, DB 같은 영속 데이터 보관에 필수다.
+- 문제 지문: Git과 GitHub의 역할 차이(로컬 버전관리 vs 원격 협업 플랫폼)를 설명할 수 있다.
+	- 멘트: Git은 로컬에서 버전 이력을 관리하는 도구이고, GitHub는 그 저장소를 원격으로 공유해 협업과 리뷰를 가능하게 하는 플랫폼이다.
+- 문제 지문: Docker가 무엇인지 핵심 개념을 설명할 수 있다.
+	- 멘트: Docker는 애플리케이션과 실행 환경을 이미지로 패키징해 어떤 컴퓨터에서도 동일하게 실행되도록 해 주는 컨테이너 기반 플랫폼이다.
+- 문제 지문: Docker 이미지와 컨테이너의 차이를 설명할 수 있다.
+	- 멘트: 이미지는 실행 환경이 담긴 읽기 전용 템플릿이고, 컨테이너는 그 이미지를 실제로 실행한 인스턴스라서 시작/중지/삭제 같은 상태 변화가 발생한다.
 - 문제 지문: 절대 경로와 상대 경로의 차이를 예시를 들어 설명할 수 있다.
-	- 멘트: 절대 경로는 `/`처럼 루트부터 시작하는 고정 주소이고, 상대 경로는 현재 위치를 기준으로 찾는 주소라서 같은 파일도 위치에 따라 표현이 달라진다.
+	- 멘트: 절대 경로는 처음부터 파일의 전체 주소를 끝까지 적는 방식이고(예: `/Users/dnldp550660/Downloads/codyssey/app/index.html`), 상대 경로는 현재 내가 작업 중인 폴더(.)를 기준으로 짧게 적는 방식이다(예: `app/index.html`). 절대 경로는 어디서 실행해도 같은 파일을 정확히 찾고 싶을 때 쓰고, 상대 경로는 같은 프로젝트 안에서 빠르게 작업할 때 쓴다.
 - 문제 지문: 파일 권한의 의미(r/w/x)와 755, 644 같은 표기가 어떤 규칙으로 해석되는지 설명할 수 있다.
 	- 멘트: `r/w/x`는 읽기/쓰기/실행 권한이고, `755`·`644`는 소유자-그룹-기타 사용자 순서로 권한을 숫자(4, 2, 1) 합으로 표현한 방식이다.
 - 문제 지문: 기존 Dockerfile을 기반으로 "커스텀 이미지"를 만들 수 있다.
 	- 멘트: 기존 베이스 이미지를 유지한 채 `COPY`, `ENV`, `RUN` 등을 추가해 서비스 목적에 맞는 설정과 파일을 넣으면 커스텀 이미지가 된다.
 - 문제 지문: 포트 매핑이 필요한 이유를 설명할 수 있다.
 	- 멘트: 컨테이너 내부 포트는 외부에서 바로 접근이 어렵기 때문에, 호스트 포트와 연결해 브라우저나 클라이언트가 서비스에 접속할 수 있게 해야 한다.
-- 문제 지문: Docker 볼륨(영속 데이터)을 설명할 수 있다.
-	- 멘트: Docker 볼륨은 컨테이너를 삭제해도 데이터가 유지되는 저장소라서 업로드 파일, 로그, DB 같은 영속 데이터 보관에 필수다.
-- 문제 지문: Git과 GitHub의 역할 차이(로컬 버전관리 vs 원격 협업 플랫폼)를 설명할 수 있다.
-	- 멘트: Git은 로컬에서 버전 이력을 관리하는 도구이고, GitHub는 그 저장소를 원격으로 공유해 협업과 리뷰를 가능하게 하는 플랫폼이다.
